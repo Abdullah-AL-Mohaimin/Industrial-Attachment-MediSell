@@ -1,0 +1,148 @@
+import React, { useState } from "react";
+import logo from "../assets/Logo.png";
+import { Link, useNavigate } from "react-router";
+import { HiOutlineUser } from "react-icons/hi2";
+import { BsCart3 } from "react-icons/bs";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { FaSearch } from "react-icons/fa";
+
+import Container from "./common/Container";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import { logoutReducer } from "../redux/slices/authSlice";
+import useCart from "../hooks/useCart";
+import useAuth from "../hooks/useAuth";
+
+const Navber = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { cart } = useCart();
+  const dispatch = useDispatch();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // console.log(logginUser);
+
+  const logout = async () => {
+    dispatch(logoutReducer());
+    let res = await axios.post(
+      `${import.meta.env.VITE_API}/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    navigate("/");
+    console.log(res);
+  };
+
+  return (
+    <nav className="bg-white ">
+      <Container>
+        <div className="h-[75px] text-white items-center flex justify-between">
+          {/* HamburgerMenuButton */}
+          <div className=" w-2/12 md:w-4/12 block sm:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="block sm:hidden sm:px-8 "
+            >
+              <GiHamburgerMenu className=" text-black text-[25px]" />
+            </button>
+          </div>
+
+          {/* logo */}
+          <div className=" w-4/12 sm:w-3/12 ">
+            <Link className=" mx-auto sm:mr-auto block" to="/">
+              <img src={logo} alt="" className="sm:h-[75px] " />
+            </Link>
+          </div>
+
+          {/* menu buttons dasktop   */}
+          <div className="hidden sm:flex gap-4 items-center justify-center sm:w-6/12">
+            <Link to="/" className=" text-base text-black font-medium">
+              Home
+            </Link>
+            <Link to="/shop" className=" text-base text-black font-medium">
+              Medicine
+            </Link>
+            <Link to="/" className=" text-base text-black font-medium">
+              Contuct us
+            </Link>
+          </div>
+
+          {/* Search Bar */}
+          <div className=" sm:px-3 sm:py-3">
+            <div className="relative max-w-7xl mx-auto flex items-center">
+
+
+              <input
+                type="text"
+                placeholder="Search by generic name"
+                className="w-full px-4 text-gray-600 py-2 border border-gray-600 rounded "
+              />
+
+              <button className="absolute right-0 px-4 py-2 text-gray-600">
+                <FaSearch />
+              </button>
+            </div>
+          </div>
+
+          {/* user and cart  */}
+          <div className="w-2/12 sm:w-3/12 flex justify-end gap-5">
+            {user ? (
+              <div className=" group relative">
+                <img
+                  className="w-[30px] h-[30px] border border-gray-400 rounded-full"
+                  src={user?.data?.image}
+                  alt={user?.data?.name}
+                />
+
+                <ul className=" bg-white z-[1000] group-hover:block absolute top-[40px] left-0 hidden">
+                  <li>
+                    <Link to="/profile" className="text-black text-xl p-4">
+                      Profile
+                    </Link>
+                  </li>
+                  <li onClick={logout} className=" text-red-500 text-xl p-4">
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              <Link to="/login">
+                <HiOutlineUser className="text-black text-[25px]" />
+              </Link>
+            )}
+
+            <Link className=" relative" to="/cart">
+              <span className=" absolute top-[-6px] right-[-6px] flex items-center justify-center h-4 w-4 bg-green-500 rounded-full text-white">
+                {cart?.data?.length ? cart?.data?.length : 0}
+              </span>
+              <BsCart3 className="text-black text-[25px]" />
+            </Link>
+          </div>
+        </div>
+
+        {/* menu buttons Mobail   */}
+        <div
+          className={`${isOpen ? "block" : "hidden"} sm:hidden space-y-2 pb-3`}
+        >
+          <a href="" className="px-4 block">
+            Home
+          </a>
+          <a href="" className="px-4 block">
+            Medicine
+          </a>
+          <a href="" className="px-4 block">
+            Contuct us
+          </a>
+        </div>
+      </Container>
+    </nav>
+  );
+};
+
+export default Navber;

@@ -1,0 +1,9 @@
+# My Intern-ship Project
+
+
+## How to run
+```bash
+npm install
+npm start
+```
+
